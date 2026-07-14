@@ -7,4 +7,5 @@ config:
     secret_access_key: ${AWS_SECRET_ACCESS_KEY}
     region: us-east-1
   authorized_keys: ./authorized_keys
+  container_prefix: 'patch-'
   production_ssh_agent: true
