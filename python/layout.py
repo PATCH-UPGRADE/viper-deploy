@@ -28,6 +28,13 @@ async def build_layout(ainjector):
                        port=3000),
             )
 
+        class blueflow_group(AwsSecurityGroup):
+            name = 'blueflow-http'
+            ingress_rules = (
+                SgRule(cidr='0.0.0.0/0',
+                       port=8000),
+            )
+
         class whs_group(AwsSecurityGroup):
             name = 'whs-http'
             ingress_rules = (
@@ -38,13 +45,13 @@ async def build_layout(ainjector):
 
         class viper_net(NetworkModel):
             v4_config = V4Config(network="172.31.100.0/24")
-            aws_security_groups = ['ssh', 'viper-http', 'whs-http']
+            aws_security_groups = ['ssh', 'viper-http', 'blueflow-http', 'whs-http']
 
         @provides(podman.podman_container_host)
         class hypervisor(MachineModel):
             name = 'hypervisor'
             add_provider(machine_implementation_key, MaybeLocalAwsVm)
-            disk_sizes=(30,)
+            disk_sizes=(20,)
             aws_instance_type = 't3.medium'
             cloud_init = True
             add_provider(InjectionKey("aws_ami"),
@@ -60,37 +67,42 @@ async def build_layout(ainjector):
                     await self.run_command('apt', '-y', 'install', 'git', 'podman', 'containers-storage', 'podman-compose', 'acl')
 
             class handle_viper(MachineCustomization):
-                @setup_task('Pull Viper & handle env')
+                @setup_task('Pull Viper')
                 async def prepare_viper(self):
                     async with self.host.filesystem_access() as fs:
                         viper_path = fs / 'srv' /'viper'
                         if not viper_path.exists():
                             viper_path.mkdir(parents=True, exist_ok=False)
-                            await self.run_command('git', 'clone', 'https://github.com/PATCH-UPGRADE/viper.git', '/srv/viper')
+                            # TODO: Switch / remove this branch once Viper changes are merged
+                            await self.run_command('git', 'clone', '-b', 'vw0-compose-blueflow-integration', 'https://github.com/PATCH-UPGRADE/viper.git', '/srv/viper')
                         else:
                             await self.run_command('bash', '-c',
                                                    'cd /srv/viper && git pull')
-                    
-                    # Avoid long build times on AWS
-                    await self.run_command('podman', 'pull', 'ghcr.io/patch-upgrade/viper:latest')
 
-                    # TODO: Handle this better. Should we mount .envs and/or handle via github secrets for this deployment type?
-                    await self.run_command('cp', '/srv/viper/.env.example', '/srv/viper/.env')
-                    await self.run_command('cp', '/srv/viper/.db.env.example', '/srv/viper/.db.env')
-
-                @setup_task('Start Viper')
+                @setup_task('Start Viper & Blueflow')
                 async def start_viper(self):
                     await self.run_command('bash', '-c',
-                                            'cd /srv/viper && podman-compose systemd -a create-unit')
+                                            'cd /srv/viper && podman-compose -f compose.blueflow.yml systemd -a create-unit')
                     await self.run_command('bash', '-c',
-                                            'cd /srv/viper && podman-compose systemd -a register')
+                                            'cd /srv/viper && podman-compose -f compose.blueflow.yml systemd -a register')
                     await self.run_command('systemctl', '--user', 'enable', '--now', 'podman-compose@viper')
 
-            class handle_blueflow(MachineCustomization):
-                pass
-
             class handle_integration(MachineCustomization):
-                pass
+                @setup_task("Copy blueflow sample assets")
+                async def copy_blueflow_assets(self):
+                    blueflow_assets_path = Path("./assets/blueflow_sample_assets.json")
+                    async with self.host.filesystem_access() as fs:
+                        dest_path = fs / 'srv' / 'viper' / 'blueflow-init' / "assets.json"
+                        dest_path.write_text(blueflow_assets_path.read_text())
+                
+                @setup_task("Load blueflow sample assets")
+                async def load_blueflow_assets(self):
+                    await self.run_command('bash', '-c',
+                                           'cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T blueflow /app/.venv/bin/python project/manage.py create_assets --filepath /blueflow-init/assets.json')
+
+                @setup_task("Create Viper credentials")
+                async def create_viper_credentials(self):
+                    pass
 
         class whs(MachineModel):
             name = 'whs'
