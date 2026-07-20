@@ -88,21 +88,32 @@ async def build_layout(ainjector):
                     await self.run_command('systemctl', '--user', 'enable', '--now', 'podman-compose@viper')
 
             class handle_integration(MachineCustomization):
-                @setup_task("Copy blueflow sample assets")
+                @setup_task("Copy & load blueflow sample assets")
                 async def copy_blueflow_assets(self):
                     blueflow_assets_path = Path("./assets/blueflow_sample_assets.json")
                     async with self.host.filesystem_access() as fs:
                         dest_path = fs / 'srv' / 'viper' / 'blueflow-init' / "assets.json"
-                        dest_path.write_text(blueflow_assets_path.read_text())
-                
-                @setup_task("Load blueflow sample assets")
-                async def load_blueflow_assets(self):
-                    await self.run_command('bash', '-c',
-                                           'cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T blueflow /app/.venv/bin/python project/manage.py create_assets --filepath /blueflow-init/assets.json')
+                        if not dest_path.exists(): # Blueflow's create_assets is not idempotent
+                            dest_path.write_text(blueflow_assets_path.read_text())
+                            await self.run_command('bash', '-c',
+                                                    'cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T blueflow /app/.venv/bin/python project/manage.py create_assets --filepath /blueflow-init/assets.json')
 
                 @setup_task("Create Viper credentials")
                 async def create_viper_credentials(self):
-                    pass
+                    await self.run_command("bash", "-c",
+                                           "cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T viper npm run db:create-test-api-key --silent | grep '^API_KEY=' | cut -d= -f2- > blueflow_integration_key")
+                    await self.run_command("bash", "-c",
+                                           "cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T viper npm run db:create-blueflow-integration --silent | grep '^INTEGRATION_TOKEN=' | cut -d= -f2- >> blueflow_integration_token")
+
+                @setup_task("Create test integration")
+                async def create_integration(self):
+                    await self.run_command("bash", "-c",
+                                            'cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T \
+                                            -e VIPER_API_URL=http://localhost:3000/api/v1 \
+                                            -e BLUEFLOW_URL=http://blueflow:8000 \
+                                            -e VIPER_API_KEY="$(cat blueflow_integration_key)" \
+                                            -e VIPER_CALLBACK_URL="http://viper:3000/api/v1/assets/integrationUpload/$(cat blueflow_integration_token)" \
+                                            viper npm run test:integration')
 
         class whs(MachineModel):
             name = 'whs'
