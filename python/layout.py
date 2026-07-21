@@ -51,8 +51,8 @@ async def build_layout(ainjector):
         class hypervisor(MachineModel):
             name = 'hypervisor'
             add_provider(machine_implementation_key, MaybeLocalAwsVm)
-            disk_sizes=(20,)
-            aws_instance_type = 't3.medium'
+            disk_sizes=(40,)
+            aws_instance_type = 't3.large'
             cloud_init = True
             add_provider(InjectionKey("aws_ami"),
             image_provider(owner=debian_ami_owner, name='debian-13-amd64-*'))
@@ -67,24 +67,25 @@ async def build_layout(ainjector):
                     await self.run_command('apt', '-y', 'install', 'git', 'podman', 'containers-storage', 'podman-compose', 'acl')
 
             class handle_viper(MachineCustomization):
-                @setup_task('Pull Viper')
-                async def prepare_viper(self):
+                @setup_task('Prepare compose')
+                async def prepare_compose(self):
+                    public_ip = str(self.host.network_links['eth0'].merged_v4_config.public_address)
                     async with self.host.filesystem_access() as fs:
                         viper_path = fs / 'srv' /'viper'
-                        if not viper_path.exists():
-                            viper_path.mkdir(parents=True, exist_ok=False)
-                            # TODO: Switch / remove this branch once Viper changes are merged
-                            await self.run_command('git', 'clone', '-b', 'vw0-compose-blueflow-integration', 'https://github.com/PATCH-UPGRADE/viper.git', '/srv/viper')
-                        else:
-                            await self.run_command('bash', '-c',
-                                                   'cd /srv/viper && git pull')
+                        compose_path = Path("./assets/compose-aws.yml")
+                        viper_path.mkdir(parents=True, exist_ok=True)
+                        (viper_path / "compose-aws.yml").write_text(compose_path.read_text())
+                        (viper_path / ".env").write_text(
+                            f"BETTER_AUTH_URL=http://{public_ip}:3000\n"
+                            f"NEXT_PUBLIC_APP_URL=http://{public_ip}\n"
+                            )
 
                 @setup_task('Start Viper & Blueflow')
                 async def start_viper(self):
                     await self.run_command('bash', '-c',
-                                            'cd /srv/viper && podman-compose -f compose.blueflow.yml systemd -a create-unit')
+                                            'cd /srv/viper && podman-compose -f compose-aws.yml --env-file .env systemd -a create-unit')
                     await self.run_command('bash', '-c',
-                                            'cd /srv/viper && podman-compose -f compose.blueflow.yml systemd -a register')
+                                            'cd /srv/viper && podman-compose -f compose-aws.yml --env-file .env systemd -a register')
                     await self.run_command('systemctl', '--user', 'enable', '--now', 'podman-compose@viper')
 
             class handle_integration(MachineCustomization):
@@ -96,19 +97,23 @@ async def build_layout(ainjector):
                         if not dest_path.exists(): # Blueflow's create_assets is not idempotent
                             dest_path.write_text(blueflow_assets_path.read_text())
                             await self.run_command('bash', '-c',
-                                                    'cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T blueflow /app/.venv/bin/python project/manage.py create_assets --filepath /blueflow-init/assets.json')
+                                                    'cd /srv/viper && '
+                                                    'while [ "$(podman inspect -f \'{{.State.Health.Status}}\' viper_blueflow_1 2>/dev/null)" != "healthy" ]; do '
+                                                    'sleep 2;'
+                                                    'done && '
+                                                    'podman-compose -f compose-aws.yml exec -T blueflow /app/.venv/bin/python project/manage.py create_assets --filepath /blueflow-init/assets.json')
 
                 @setup_task("Create Viper credentials")
                 async def create_viper_credentials(self):
                     await self.run_command("bash", "-c",
-                                           "cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T viper npm run db:create-test-api-key --silent | grep '^API_KEY=' | cut -d= -f2- > blueflow_integration_key")
+                                           "cd /srv/viper && podman-compose -f compose-aws.yml exec -T viper npm run db:create-test-api-key --silent | grep '^API_KEY=' | cut -d= -f2- > blueflow_integration_key")
                     await self.run_command("bash", "-c",
-                                           "cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T viper npm run db:create-blueflow-integration --silent | grep '^INTEGRATION_TOKEN=' | cut -d= -f2- >> blueflow_integration_token")
+                                           "cd /srv/viper && podman-compose -f compose-aws.yml exec -T viper npm run db:create-blueflow-integration --silent | grep '^INTEGRATION_TOKEN=' | cut -d= -f2- >> blueflow_integration_token")
 
                 @setup_task("Create test integration")
                 async def create_integration(self):
                     await self.run_command("bash", "-c",
-                                            'cd /srv/viper && podman-compose -f compose.blueflow.yml exec -T \
+                                            'cd /srv/viper && podman-compose -f compose-aws.yml exec -T \
                                             -e VIPER_API_URL=http://localhost:3000/api/v1 \
                                             -e BLUEFLOW_URL=http://blueflow:8000 \
                                             -e VIPER_API_KEY="$(cat blueflow_integration_key)" \
