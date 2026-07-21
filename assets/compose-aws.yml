@@ -28,6 +28,7 @@ services:
     image: ghcr.io/patch-upgrade/viper:latest
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/viper
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-*}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-not-for-production-change-me}
       SMTP_FROM: ${SMTP_FROM:-Viper <noreply@viper-xi.app>}
       SMTP_HOST: ${SMTP_HOST:-SMTP-host-not-set}
