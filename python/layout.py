@@ -80,13 +80,14 @@ async def build_layout(ainjector):
                             f"NEXT_PUBLIC_APP_URL=http://{public_ip}\n"
                             )
 
+                        systemd_path = fs / 'etc' / 'systemd' / 'system'
+                        service_path = Path("./assets/viper.service")
+                        (systemd_path / "viper.service").write_text(service_path.read_text())
+
                 @setup_task('Start Viper & Blueflow')
                 async def start_viper(self):
-                    await self.run_command('bash', '-c',
-                                            'cd /srv/viper && podman-compose -f compose-aws.yml --env-file .env systemd -a create-unit')
-                    await self.run_command('bash', '-c',
-                                            'cd /srv/viper && podman-compose -f compose-aws.yml --env-file .env systemd -a register')
-                    await self.run_command('systemctl', '--user', 'enable', '--now', 'podman-compose@viper')
+                    await self.run_command('systemctl', 'daemon-reload')
+                    await self.run_command('systemctl', 'enable', '--now', 'viper.service')
 
             class handle_integration(MachineCustomization):
                 @setup_task("Copy & load blueflow sample assets")

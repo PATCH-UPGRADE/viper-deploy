@@ -1,0 +1,15 @@
+[Unit]
+Description=Viper via Podman Compose
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+WorkingDirectory=/srv/viper
+
+ExecStart=/usr/bin/podman-compose -f compose-aws.yml --env-file .env up -d
+ExecStop=/usr/bin/podman-compose -f compose-aws.yml --env-file .env down
+
+[Install]
+WantedBy=multi-user.target
