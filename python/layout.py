@@ -47,6 +47,9 @@ async def build_layout(ainjector):
             v4_config = V4Config(network="172.31.100.0/24")
             aws_security_groups = ['ssh', 'viper-http', 'blueflow-http', 'whs-http']
 
+        class viper_address(VpcAddress):
+            name = 'viper'
+
         @provides(podman.podman_container_host)
         class hypervisor(MachineModel):
             name = 'hypervisor'
@@ -58,7 +61,8 @@ async def build_layout(ainjector):
             image_provider(owner=debian_ami_owner, name='debian-13-amd64-*'))
 
             class net_config(NetworkConfigModel):
-                add('eth0', mac=None, net=InjectionKey('viper_net'))
+                add('eth0', mac=None, net=InjectionKey('viper_net'),
+                    v4_config=V4Config(public_address=injector_access(viper_address)))
 
             class install_packages(FilesystemCustomization):
                 @setup_task('Install packages')
