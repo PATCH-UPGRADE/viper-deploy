@@ -6,6 +6,7 @@ config:
     access_key_id: ${AWS_ACCESS_KEY_ID}
     secret_access_key: ${AWS_SECRET_ACCESS_KEY}
     region: us-east-1
+    vpc_name: northeastern
   authorized_keys: ./authorized_keys
   container_prefix: 'patch-'
   production_ssh_agent: true

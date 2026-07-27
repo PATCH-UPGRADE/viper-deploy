@@ -44,7 +44,7 @@ async def build_layout(ainjector):
         
 
         class viper_net(NetworkModel):
-            v4_config = V4Config(network="172.31.100.0/24")
+            v4_config = V4Config(network="10.10.1.0/24")
             aws_security_groups = ['ssh', 'viper-http', 'blueflow-http', 'whs-http']
 
         class viper_address(VpcAddress):
@@ -54,7 +54,7 @@ async def build_layout(ainjector):
         class hypervisor(MachineModel):
             name = 'hypervisor'
             add_provider(machine_implementation_key, MaybeLocalAwsVm)
-            disk_sizes=(40,)
+            disk_sizes = (40,)
             aws_instance_type = 't3.large'
             cloud_init = True
             add_provider(InjectionKey("aws_ami"),
