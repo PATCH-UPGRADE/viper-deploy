@@ -70,7 +70,7 @@ async def build_layout(ainjector):
                     await self.run_command('apt', 'update')
                     await self.run_command('apt', '-y', 'install', 'git', 'podman', 'containers-storage', 'podman-compose', 'acl', 'just')
 
-            class handle_assets(MachineCustomization):
+            class prepare_assets(MachineCustomization):
                 @setup_task('Prepare assets')
                 async def prepare_assets(self):
                     public_ip = str(self.host.network_links['eth0'].merged_v4_config.public_address)

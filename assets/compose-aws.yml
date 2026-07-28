@@ -121,10 +121,11 @@ services:
       CELERY_BROKER_URL: redis://blueflow-redis:6379/0
       CELERY_TASK_ALWAYS_EAGER: true
       DJANGO_SETTINGS_MODULE: project.settings.development
-      DJANGO_SECRET_KEY: not-for-production
+      DJANGO_SECRET_KEY: demo-not-for-production
       DJANGO_ALLOWED_HOSTS: blueflow,localhost,127.0.0.1,*
       VIPER_CALLBACK_ALLOWED_HOSTS: viper
       VIPER_CALLBACK_TIMEOUT: 30
+      API_TOKEN: ${BLUEFLOW_API_TOKEN:-demo-not-for-production}
     healthcheck:
       test: ['CMD-SHELL', '/app/.venv/bin/python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(\"http://127.0.0.1:8000/api/\").getcode() < 400 else 1)"']
       start_period: 15s
@@ -147,7 +148,7 @@ services:
       CELERY_BROKER_URL: redis://blueflow-redis:6379/0
       CELERY_TASK_ALWAYS_EAGER: true
       DJANGO_SETTINGS_MODULE: project.settings.development
-      SECRET_KEY: not-for-production
+      SECRET_KEY: demo-not-for-production
     command:  ["uv", "run", "celery", "-A", "blueflow.celery", "worker", "-l", "info"]
     networks:
       - viper_stack
@@ -165,7 +166,7 @@ services:
       - NET_ADMIN
     environment:
       BLUEFLOW_URL: http://blueflow:8000
-      BLUEFLOW_TOKEN: demo-tapirxl-token-not-for-production
+      BLUEFLOW_TOKEN: demo-not-for-production
       TAPIRXL_MODE: pcap
       TAPIRXL_PCAP_PATH: /pcap/synthetic_philips_demo.pcap
       TAPIRXL_INTERFACE: eth0
