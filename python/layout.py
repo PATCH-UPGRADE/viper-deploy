@@ -68,62 +68,30 @@ async def build_layout(ainjector):
                 @setup_task('Install packages')
                 async def install_podman(self):
                     await self.run_command('apt', 'update')
-                    await self.run_command('apt', '-y', 'install', 'git', 'podman', 'containers-storage', 'podman-compose', 'acl')
+                    await self.run_command('apt', '-y', 'install', 'git', 'podman', 'containers-storage', 'podman-compose', 'acl', 'just')
 
-            class handle_viper(MachineCustomization):
-                @setup_task('Prepare compose')
-                async def prepare_compose(self):
+            class handle_assets(MachineCustomization):
+                @setup_task('Prepare assets')
+                async def prepare_assets(self):
                     public_ip = str(self.host.network_links['eth0'].merged_v4_config.public_address)
                     async with self.host.filesystem_access() as fs:
                         viper_path = fs / 'srv' /'viper'
-                        compose_path = Path("./assets/compose-aws.yml")
                         viper_path.mkdir(parents=True, exist_ok=True)
-                        (viper_path / "compose-aws.yml").write_text(compose_path.read_text())
                         (viper_path / ".env").write_text(
                             f"BETTER_AUTH_URL=http://{public_ip}:3000\n"
                             f"NEXT_PUBLIC_APP_URL=http://{public_ip}\n"
                             )
 
-                        systemd_path = fs / 'etc' / 'systemd' / 'system'
-                        service_path = Path("./assets/viper.service")
-                        (systemd_path / "viper.service").write_text(service_path.read_text())
+                        assets_path = Path("./assets")
+                        for file_path in assets_path.rglob('*'):
+                            if file_path.is_file():
+                                relative_path = file_path.relative_to(assets_path)
+                                destination_path = viper_path / relative_path
+                                destination_path.parent.mkdir(parents=True, exist_ok=True)
+                                destination_path.write_text(file_path.read_text())
 
-                @setup_task('Start Viper & Blueflow')
-                async def start_viper(self):
-                    await self.run_command('systemctl', 'daemon-reload')
-                    await self.run_command('systemctl', 'enable', '--now', 'viper.service')
-
-            class handle_integration(MachineCustomization):
-                @setup_task("Copy & load blueflow sample assets")
-                async def copy_blueflow_assets(self):
-                    blueflow_assets_path = Path("./assets/blueflow_sample_assets.json")
-                    async with self.host.filesystem_access() as fs:
-                        dest_path = fs / 'srv' / 'viper' / 'blueflow-init' / "assets.json"
-                        if not dest_path.exists(): # Blueflow's create_assets is not idempotent
-                            dest_path.write_text(blueflow_assets_path.read_text())
-                            await self.run_command('bash', '-c',
-                                                    'cd /srv/viper && '
-                                                    'while [ "$(podman inspect -f \'{{.State.Health.Status}}\' viper_blueflow_1 2>/dev/null)" != "healthy" ]; do '
-                                                    'sleep 2;'
-                                                    'done && '
-                                                    'podman-compose -f compose-aws.yml exec -T blueflow /app/.venv/bin/python project/manage.py create_assets --filepath /blueflow-init/assets.json')
-
-                @setup_task("Create Viper credentials")
-                async def create_viper_credentials(self):
-                    await self.run_command("bash", "-c",
-                                           "cd /srv/viper && podman-compose -f compose-aws.yml exec -T viper npm run db:create-test-api-key --silent | grep '^API_KEY=' | cut -d= -f2- > blueflow_integration_key")
-                    await self.run_command("bash", "-c",
-                                           "cd /srv/viper && podman-compose -f compose-aws.yml exec -T viper npm run db:create-blueflow-integration --silent | grep '^INTEGRATION_TOKEN=' | cut -d= -f2- >> blueflow_integration_token")
-
-                @setup_task("Create test integration")
-                async def create_integration(self):
-                    await self.run_command("bash", "-c",
-                                            'cd /srv/viper && podman-compose -f compose-aws.yml exec -T \
-                                            -e VIPER_API_URL=http://localhost:3000/api/v1 \
-                                            -e BLUEFLOW_URL=http://blueflow:8000 \
-                                            -e VIPER_API_KEY="$(cat blueflow_integration_key)" \
-                                            -e VIPER_CALLBACK_URL="http://viper:3000/api/v1/assets/integrationUpload/$(cat blueflow_integration_token)" \
-                                            viper npm run test:integration')
+                    # Not currently used; handling starting & integration via Justfile for first IV&V metric
+                    await self.run_command('cp', '/srv/viper/viper.service', '/etc/systemd/system/viper.service')
 
         class whs(MachineModel):
             name = 'whs'

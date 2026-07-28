@@ -1,0 +1,9 @@
+start:
+    bash init/start.sh
+
+stop:
+    bash init/stop.sh
+
+reset:
+    bash init/reset.sh
+
