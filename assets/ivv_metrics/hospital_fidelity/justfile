@@ -11,4 +11,4 @@ seed:
     bash init/seed.sh
 
 integrate:
-    echo "foo"
+    bash init/integrate.sh

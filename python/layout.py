@@ -68,7 +68,7 @@ async def build_layout(ainjector):
                 @setup_task('Install packages')
                 async def install_podman(self):
                     await self.run_command('apt', 'update')
-                    await self.run_command('apt', '-y', 'install', 'git', 'podman', 'containers-storage', 'podman-compose', 'acl', 'just')
+                    await self.run_command('apt', '-y', 'install', 'git', 'podman', 'containers-storage', 'podman-compose', 'acl', 'just', 'jq')
 
             class prepare_assets(MachineCustomization):
                 @setup_task('Prepare assets')
