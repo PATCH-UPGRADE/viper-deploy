@@ -79,7 +79,7 @@ async def build_layout(ainjector):
                         viper_path.mkdir(parents=True, exist_ok=True)
                         (viper_path / ".env").write_text(
                             f"BETTER_AUTH_URL=http://{public_ip}:3000\n"
-                            f"NEXT_PUBLIC_APP_URL=http://{public_ip}\n"
+                            f"NEXT_PUBLIC_APP_URL=http://{public_ip}:3000\n"
                             )
 
                         assets_path = Path("./assets")
