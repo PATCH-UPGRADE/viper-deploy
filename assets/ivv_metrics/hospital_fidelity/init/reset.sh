@@ -6,5 +6,5 @@ echo "All Viper & Blueflow data will be cleared."
 echo -e "---------------------------------------------------------------\n"
 
 podman-compose -f /srv/viper/compose-aws.yml down --volumes
-podman-compose -f /srv/viper/compose-aws.yml --env-file /srv/viper/.env up -d
+podman-compose -f /srv/viper/compose-aws.yml up -d
 

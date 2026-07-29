@@ -39,3 +39,5 @@ curl -sS -X POST "${VIPER_URL}/api/trpc/integrations.triggerSync?batch=1" \
   -H "Authorization: Bearer ${VIPER_API_KEY}" \
   -H "Content-Type: application/json" \
   --data-raw "{\"0\":{\"json\":{\"id\":\"${INTEGRATION_ID}\"}}}"
+
+echo ""

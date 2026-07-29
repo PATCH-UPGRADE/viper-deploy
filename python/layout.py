@@ -41,11 +41,19 @@ async def build_layout(ainjector):
                 SgRule(cidr='0.0.0.0/0',
                        port=8080),
             )
-        
+
+        class proxy_group(AwsSecurityGroup):
+            name = 'proxy'
+            ingress_rules = (
+                SgRule(cidr='0.0.0.0/0',
+                       port=80),
+                SgRule(cidr='0.0.0.0/0',
+                       port=443),
+            )
 
         class viper_net(NetworkModel):
             v4_config = V4Config(network="10.10.1.0/24")
-            aws_security_groups = ['ssh', 'viper-http', 'blueflow-http', 'whs-http']
+            aws_security_groups = ['ssh', 'viper-http', 'blueflow-http', 'whs-http', 'proxy']
 
         class viper_address(VpcAddress):
             name = 'viper'
@@ -73,14 +81,9 @@ async def build_layout(ainjector):
             class prepare_assets(MachineCustomization):
                 @setup_task('Prepare assets')
                 async def prepare_assets(self):
-                    public_ip = str(self.host.network_links['eth0'].merged_v4_config.public_address)
                     async with self.host.filesystem_access() as fs:
                         viper_path = fs / 'srv' /'viper'
                         viper_path.mkdir(parents=True, exist_ok=True)
-                        (viper_path / ".env").write_text(
-                            f"BETTER_AUTH_URL=http://{public_ip}:3000\n"
-                            f"NEXT_PUBLIC_APP_URL=http://{public_ip}:3000\n"
-                            )
 
                         assets_path = Path("./assets")
                         for file_path in assets_path.rglob('*'):

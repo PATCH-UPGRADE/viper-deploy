@@ -1,0 +1,3 @@
+demo.viper-xi.app {
+    reverse_proxy viper:3000
+}
