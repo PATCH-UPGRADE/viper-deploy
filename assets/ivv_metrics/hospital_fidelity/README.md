@@ -21,7 +21,8 @@
 #### Check number of assets in Viper prior to integrating with Blueflow
 - just evaluate
 
-#### Integrate with the Blueflow CMMS
+#### Integrate with the Blueflow CMMS.
+*This has an intentional non-scientific `sleep` to allow the initial sync to complete on slower EC2 instances*
 - just integrate
 
 #### Check number of assets in Viper after integrating with Blueflow

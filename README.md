@@ -2,7 +2,11 @@
 - Viper-deploy is a [Carthage layout](https://github.com/hadron/carthage) for deploying [Viper](https://github.com/patch-upgrade/viper) and [Blueflow](https://github.com/virtalabs/blueflow) to AWS.
 
 ### How to deploy
-- Coming soon
+*More details pending*
+- Install [Carthage](https://github.com/hadron/carthage)
+- Create an IAM user with enough permissions to create & manage EC2 instances -- see docs/IAM_role_policy.json for an example
+- Have aws_access_key_id and aws_secret_access_key in ~/.aws/config so that Carthage can find it
+- Clone this repo, cd to it, and use carthage-runner
 
 ### Instance size considerations
 - Viper, Blueflow, & the WHS are happy enough on a t3.medium with a 20GB disk. 

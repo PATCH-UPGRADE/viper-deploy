@@ -141,7 +141,6 @@ services:
       VIPER_CALLBACK_TIMEOUT: 30
       API_TOKEN: demo-not-for-production
     restart: on-failure
-    # Optional: limit the number of restart attempts (supported in modern Compose specs)
     deploy:
       restart_policy:
         condition: on-failure
