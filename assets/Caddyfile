@@ -1,3 +1,8 @@
-demo.viper-xi.app {
+# Switch to LE staging environment for frequent test deployments
+{
+   # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+test-ivv-demo.viper-xi.app {
     reverse_proxy viper:3000
 }

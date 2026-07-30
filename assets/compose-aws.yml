@@ -28,25 +28,25 @@ services:
     image: ghcr.io/patch-upgrade/viper:latest
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/viper
-      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-https://demo.viper-xi.app}
-      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-not-for-production-change-me}
-      SMTP_FROM: ${SMTP_FROM:-Viper <noreply@viper-xi.app>}
-      SMTP_HOST: ${SMTP_HOST:-SMTP-host-not-set}
-      SMTP_PORT: ${SMTP_PORT:-465}
-      SMTP_SECURE: ${SMTP_SECURE:-true}
-      SMTP_USER: ${SMTP_USER:-smtp-user}
-      SMTP_PASS: ${SMTP_PASS:-smtp-password}
-      RESEND_API_KEY: ${RESEND_API_KEY:-false}
-      RESEND_WEBHOOK_SECRET: ${RESEND_WEBHOOK_SECRET:-false}
-      DOMAIN_WHITELIST: ${DOMAIN_WHITELIST:-domains-not-set.fake-tld}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-fake-anthropic-key}
-      HELM_URL: ${HELM_URL:-helm-url}
-      HELM_TOKEN: ${HELM_TOKEN:-helm-token}
-      NETWORK_FLOW_URL: ${NETWORK_FLOW_URL:-network-flow-url}
-      NETWORK_FLOW_TOKEN: ${NETWORK_FLOW_TOKEN:-network-flow-token}
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://demo.viper-xi.app}
-      N8N_KEY: ${N8N_KEY:-n8n-key}
-      N8N_AI_SYNC_URL: ${N8N_AI_SYNC_URL:-n8n-ai-sync-url}
+      NEXT_PUBLIC_APP_URL: https://test-ivv-demo.viper-xi.app
+      BETTER_AUTH_URL: https://test-ivv-demo.viper-xi.app
+      BETTER_AUTH_SECRET: not-for-production-change-me
+      SMTP_FROM: Viper <noreply@viper-xi.app>
+      SMTP_HOST: SMTP-host-not-set.com
+      SMTP_PORT: 465
+      SMTP_SECURE: true
+      SMTP_USER: smtp-user
+      SMTP_PASS: smtp-password
+      RESEND_API_KEY: false
+      RESEND_WEBHOOK_SECRET: false
+      DOMAIN_WHITELIST: domains-not-set.fake-tld
+      ANTHROPIC_API_KEY: fake-anthropic-key
+      HELM_URL: helm-url.com
+      HELM_TOKEN: helm-token
+      NETWORK_FLOW_URL: network-flow-url
+      NETWORK_FLOW_TOKEN: network-flow-token
+      N8N_KEY: n8n-key
+      N8N_AI_SYNC_URL: n8n-ai-sync-url
       INNGEST_DEV: 1
       INNGEST_BASE_URL: http://inngest:8288
       PRISMA_CLIENT_ENGINE_TYPE: binary
@@ -82,8 +82,8 @@ services:
       - "443:443"
     volumes:
       - /srv/viper/Caddyfile:/etc/caddy/Caddyfile
-      - /srv/viper/caddy_data:/caddy_data
-      - /srv/viper/caddy_config:/caddy_config
+      - /srv/viper/caddy_data:/data
+      - /srv/viper/caddy_config:/config
     depends_on:
       - viper
     networks:
@@ -131,7 +131,7 @@ services:
     environment:
       BASE_URL: http://blueflow:8000
       DATABASE_URL: postgresql://blueflow:blueflow@blueflow-postgres:5432/blueflow
-      RESDIS_URL: resdis://blueflow-redis:6379/0
+      REDIS_URL: redis://blueflow-redis:6379/0
       CELERY_BROKER_URL: redis://blueflow-redis:6379/0
       CELERY_TASK_ALWAYS_EAGER: true
       DJANGO_SETTINGS_MODULE: project.settings.development
@@ -139,7 +139,13 @@ services:
       DJANGO_ALLOWED_HOSTS: blueflow,localhost,127.0.0.1,*
       VIPER_CALLBACK_ALLOWED_HOSTS: viper
       VIPER_CALLBACK_TIMEOUT: 30
-      API_TOKEN: ${BLUEFLOW_API_TOKEN:-demo-not-for-production}
+      API_TOKEN: demo-not-for-production
+    restart: on-failure
+    # Optional: limit the number of restart attempts (supported in modern Compose specs)
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     healthcheck:
       test: ['CMD-SHELL', '/app/.venv/bin/python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(\"http://127.0.0.1:8000/api/\").getcode() < 400 else 1)"']
       start_period: 15s
@@ -166,7 +172,7 @@ services:
     command:  ["uv", "run", "celery", "-A", "blueflow.celery", "worker", "-l", "info"]
     networks:
       - viper_stack
-    
+
   tapirxl:
     image: docker.io/virtalabsinc/tapirxl:demo-latest
     volumes:
@@ -195,3 +201,6 @@ volumes:
   blueflow-pgdata:
   blueflow-redis-data:
   tapirxl-spool:
+  Caddyfile:
+  caddy_data:
+  caddy_config:

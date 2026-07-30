@@ -4,7 +4,7 @@ echo -e "\n---------------------------------------------------------------"
 echo "Creating integration between Viper & Blueflow."
 echo -e "---------------------------------------------------------------\n"
 
-VIPER_API_KEY=$(podman-compose -f /srv/viper/compose-aws.yml exec -T viper npm run db:create-test-api-key --silent 2>/dev/null | grep '^API_KEY=' | cut -d= -f2-)
+VIPER_API_KEY=$(cat /srv/viper/VIPER_API_KEY)
 VIPER_URL="${VIPER_URL:-http://localhost:3000}"
 BLUEFLOW_URL="${BLUEFLOW_URL:-http://localhost:8000}"
 BLUEFLOW_INTERNAL_URL="${BLUEFLOW_INTERNAL_URL:-http://blueflow:8000}"
@@ -41,3 +41,8 @@ curl -sS -X POST "${VIPER_URL}/api/trpc/integrations.triggerSync?batch=1" \
   --data-raw "{\"0\":{\"json\":{\"id\":\"${INTEGRATION_ID}\"}}}"
 
 echo ""
+sleep 30 # Let the initial sync finish
+
+echo -e "\n---------------------------------------------------------------"
+echo "Integration between Viper & Blueflow completed."
+echo -e "---------------------------------------------------------------\n"

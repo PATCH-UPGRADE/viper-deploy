@@ -7,8 +7,21 @@ stop:
 reset:
     bash init/reset.sh
 
+create-viper-api-key:
+    bash: init/create-viper-api-key.sh
+
+evaluate:
+    bash init/evaluate.sh
+
 seed:
     bash init/seed.sh
 
 integrate:
     bash init/integrate.sh
+
+test:
+    just create-viper-api-key
+    just seed
+    just evaluate
+    just integrate
+    just evaluate
