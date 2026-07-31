@@ -28,10 +28,10 @@ services:
     image: ghcr.io/patch-upgrade/viper:latest
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/viper
-      NEXT_PUBLIC_APP_URL: https://test-ivv-demo.viper-xi.app
-      BETTER_AUTH_URL: https://test-ivv-demo.viper-xi.app
+      NEXT_PUBLIC_APP_URL: https://demo.viper-xi.app
+      BETTER_AUTH_URL: https://demo.viper-xi.app
       BETTER_AUTH_SECRET: not-for-production-change-me
-      SMTP_FROM: Viper <noreply@viper-xi.app>
+      SMTP_FROM: Viper <noreply@demo.viper-xi.app>
       SMTP_HOST: SMTP-host-not-set.com
       SMTP_PORT: 465
       SMTP_SECURE: true

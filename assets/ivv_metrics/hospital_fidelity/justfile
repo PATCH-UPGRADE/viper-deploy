@@ -8,7 +8,7 @@ reset:
     bash init/reset.sh
 
 create-viper-api-key:
-    bash: init/create-viper-api-key.sh
+    bash init/create-viper-api-key.sh
 
 evaluate:
     bash init/evaluate.sh
