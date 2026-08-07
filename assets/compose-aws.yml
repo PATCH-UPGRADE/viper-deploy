@@ -40,7 +40,7 @@ services:
       RESEND_API_KEY: false
       RESEND_WEBHOOK_SECRET: false
       DOMAIN_WHITELIST: domains-not-set.fake-tld
-      ANTHROPIC_API_KEY: fake-anthropic-key
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-fake-anthropic-key}
       HELM_URL: helm-url.com
       HELM_TOKEN: helm-token
       NETWORK_FLOW_URL: network-flow-url

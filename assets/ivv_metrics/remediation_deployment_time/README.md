@@ -15,9 +15,11 @@ extended thinking), and a single mitigation step has been observed near 95
 seconds on its own. This metric reports duration only; it deliberately asserts
 nothing about the analysis content.*
 
-*This metric requires a working `ANTHROPIC_API_KEY` in the Viper container. The
-deployed `compose-aws.yml` ships a placeholder, so on the demo box the job fails
-after ~5 minutes of retries instead of producing a number.*
+*This metric requires a working `ANTHROPIC_API_KEY` in the Viper container —
+without one the job fails after ~5 minutes of retries instead of producing a
+number. `compose-aws.yml` ships a placeholder and reads the real key from the
+shell environment: `export ANTHROPIC_API_KEY=sk-ant-...` before `just start`.
+Never commit a real key to this repo.*
 
 ### Navigate to the justfile
 - cd /srv/viper/ivv_metrics/remediation_deployment_time
@@ -50,17 +52,17 @@ measurement's analysis results can never leak into the next one.*
 #### Reset the environment and clear all data in order to re-run tests
 - just reset
 
-### Example output
+### Example output (real run, local dev stack)
 
 ```
-Submitted remediation cmsjg3gpp0001h6qjgvoo7tkg
-Analysis run 01KZF1BX3522NMM7F4BF6M5ARW; polling until it terminates (timeout 900s)...
+Submitted remediation cmsjh4az00007h6tgfjl7rbtq
+Analysis run 01KZF30BJ7E2HXXHRJY4ZNHRHX; polling until it terminates (timeout 900s)...
 -------------------------------------------------------------
-Remediation submitted:          cmsjg3gpp0001h6qjgvoo7tkg
-Notification created:           cmsjg41k70003h6qj4v8n2xps
+Remediation submitted:          cmsjh4az00007h6tgfjl7rbtq
+Notification created:           cmsjh4bdh000ch6tgwxy9nfgi
 Inngest run status:             Completed
-Inngest run duration (seconds): 143
-Submit-to-complete wall clock:  148 seconds
+Inngest run duration (seconds): 131
+Submit-to-complete wall clock:  132 seconds
 -------------------------------------------------------------
 ```
 
