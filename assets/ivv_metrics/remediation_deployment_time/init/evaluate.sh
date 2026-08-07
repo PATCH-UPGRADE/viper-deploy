@@ -37,7 +37,7 @@ CREATE_RESPONSE=$(curl --silent --show-error --fail-with-body \
       artifactType: "Documentation",
       downloadUrl: "https://example.com/rdt-metric-notes.pdf"
     }]
-  }')")
+  }')") || { echo "ERROR: remediation POST failed: ${CREATE_RESPONSE}" >&2; exit 1; }
 
 REMEDIATION_ID=$(jq -er '.remediation.id' <<<"${CREATE_RESPONSE}")
 echo "Submitted remediation ${REMEDIATION_ID}"
