@@ -12,3 +12,11 @@ create-viper-api-key:
 
 seed:
     bash init/seed.sh
+
+evaluate:
+    bash init/evaluate.sh
+
+test:
+    just create-viper-api-key
+    just seed
+    just evaluate
