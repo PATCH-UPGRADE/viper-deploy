@@ -15,3 +15,4 @@
 ### Other considerations
 - Be mindful of Let's Encrypt rate limiting if re-deploying frequently. Consider editing the Caddyfile to use staging certs for development if necessary.
 - The remediation_deployment_time IV&V metric requires a real `ANTHROPIC_API_KEY` exported in the shell before starting the stack -- see assets/ivv_metrics/remediation_deployment_time/README.md.
+- The target-hospital-environment harness seeds a representative 1,500-asset fleet directly into Viper -- see assets/target-hospital-environment/README.md.
