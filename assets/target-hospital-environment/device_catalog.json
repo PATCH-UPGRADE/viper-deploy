@@ -1,0 +1,14 @@
+[
+  { "name": "GE Healthcare HiSpeed CT/e",      "cpe": "cpe:2.3:h:ge_healthcare:hispeed_ct_e:2.7.78",       "role": "CT Scanner" },
+  { "name": "GE Healthcare Carescape R860",    "cpe": "cpe:2.3:h:ge_healthcare:carescape_r860:10.1",       "role": "Ventilator" },
+  { "name": "Philips IntelliVue MP70",         "cpe": "cpe:2.3:h:philips:intellivue_mp70:4.1.2",           "role": "Patient Monitor" },
+  { "name": "Philips Azurion 7",               "cpe": "cpe:2.3:h:philips:azurion_7:2.1",                   "role": "Interventional X-Ray" },
+  { "name": "Baxter Sigma Spectrum",           "cpe": "cpe:2.3:h:baxter:sigma_spectrum:8.0.1",             "role": "Infusion Pump" },
+  { "name": "Siemens SOMATOM go.Up",           "cpe": "cpe:2.3:h:siemens_healthineers:somatom_go_up:va30", "role": "CT Scanner" },
+  { "name": "Draeger Evita V500",              "cpe": "cpe:2.3:h:draeger:evita_v500:2.30",                 "role": "Ventilator" },
+  { "name": "Medtronic Capnostream 35",        "cpe": "cpe:2.3:h:medtronic:capnostream_35:1.5.0",          "role": "Capnography Monitor" },
+  { "name": "Abbott i-STAT Alinity",           "cpe": "cpe:2.3:h:abbott:i_stat_alinity:3.2.1",             "role": "Blood Analyzer" },
+  { "name": "Roche cobas pro",                 "cpe": "cpe:2.3:h:roche:cobas_pro:1.4.0",                   "role": "Lab Analyzer" },
+  { "name": "Mindray BeneVision N22",          "cpe": "cpe:2.3:h:mindray:benevision_n22:5.3.2",            "role": "Patient Monitor" },
+  { "name": "Fujifilm FDR D-EVO III",          "cpe": "cpe:2.3:h:fujifilm:fdr_d_evo_iii:1.2",              "role": "X-Ray Detector" }
+]
