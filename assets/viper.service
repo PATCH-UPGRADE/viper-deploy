@@ -6,7 +6,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 RemainAfterExit=true
-WorkingDirectory=/srv/viper
+WorkingDirectory=/srv/viper-deploy/assets
 
 ExecStart=/usr/bin/podman-compose -f compose-aws.yml --env-file .env up -d
 ExecStop=/usr/bin/podman-compose -f compose-aws.yml --env-file .env down

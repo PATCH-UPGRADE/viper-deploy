@@ -4,7 +4,7 @@ echo -e "\n---------------------------------------------------------------"
 echo "Creating integration between Viper & Blueflow."
 echo -e "---------------------------------------------------------------\n"
 
-VIPER_API_KEY=$(cat /srv/viper/VIPER_API_KEY)
+VIPER_API_KEY=$(cat /srv/viper-deploy/assets/VIPER_API_KEY)
 VIPER_URL="${VIPER_URL:-http://localhost:3000}"
 BLUEFLOW_URL="${BLUEFLOW_URL:-http://localhost:8000}"
 BLUEFLOW_INTERNAL_URL="${BLUEFLOW_INTERNAL_URL:-http://blueflow:8000}"

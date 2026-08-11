@@ -82,19 +82,13 @@ async def build_layout(ainjector):
                 @setup_task('Prepare assets')
                 async def prepare_assets(self):
                     async with self.host.filesystem_access() as fs:
-                        viper_path = fs / 'srv' /'viper'
+                        viper_path = fs / 'srv' /'viper-deploy'
                         viper_path.mkdir(parents=True, exist_ok=True)
 
-                        assets_path = Path("./assets")
-                        for file_path in assets_path.rglob('*'):
-                            if file_path.is_file():
-                                relative_path = file_path.relative_to(assets_path)
-                                destination_path = viper_path / relative_path
-                                destination_path.parent.mkdir(parents=True, exist_ok=True)
-                                destination_path.write_text(file_path.read_text())
+                    await self.run_command('git', 'clone', 'https://github.com/PATCH-UPGRADE/viper-deploy.git', '/srv/viper-deploy')
 
                     # Not currently used; handling starting & integration via Justfile for first IV&V metric
-                    await self.run_command('cp', '/srv/viper/viper.service', '/etc/systemd/system/viper.service')
+                    await self.run_command('cp', '/srv/viper-deploy/assets/viper.service', '/etc/systemd/system/viper.service')
 
         class whs(MachineModel):
             name = 'whs'

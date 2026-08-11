@@ -81,9 +81,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /srv/viper/Caddyfile:/etc/caddy/Caddyfile
-      - /srv/viper/caddy_data:/data
-      - /srv/viper/caddy_config:/config
+      - /srv/viper-deploy/assets/Caddyfile:/etc/caddy/Caddyfile
+      - /srv/viper-deploy/assets/caddy_data:/data
+      - /srv/viper-deploy/assets/caddy_config:/config
     depends_on:
       - viper
     networks:

@@ -5,7 +5,7 @@
 *Note that `just create-viper-api-key` creates an API key used by other commands that will expire after 24 hours by design. Re-run this command to create a new key.*
 
 ### Navigate to the justfile
-- cd /srv/viper/ivv_metrics/hospital_fidelity
+- cd /srv/viper-deploy/assets/ivv_metrics/hospital_fidelity
 
 ### Testing commands:
 
