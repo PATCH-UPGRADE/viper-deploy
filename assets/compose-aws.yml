@@ -25,7 +25,7 @@ services:
       - viper_stack
 
   viper:
-    image: ghcr.io/patch-upgrade/viper:latest
+    image: ghcr.io/patch-upgrade/viper:${VIPER_VERSION:-latest}
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/viper
       NEXT_PUBLIC_APP_URL: https://demo.viper-xi.app
