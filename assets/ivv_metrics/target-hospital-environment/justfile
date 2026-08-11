@@ -1,0 +1,22 @@
+start:
+    bash init/start.sh
+
+stop:
+    bash init/stop.sh
+
+reset:
+    bash init/reset.sh
+
+create-viper-api-key:
+    bash init/create-viper-api-key.sh
+
+seed:
+    bash init/seed.sh
+
+scale:
+    bash init/scale.sh
+
+test:
+    just create-viper-api-key
+    just seed
+    just scale
