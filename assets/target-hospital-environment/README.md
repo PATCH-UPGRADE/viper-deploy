@@ -19,11 +19,11 @@ Blueflow assets found in Viper by MAC address — reusing Blueflow's MACs here
 would make that metric pass without any integration having run.*
 
 *`just seed` and `just scale` track what they created in
-`/srv/viper/TARGET_HOSPITAL_ASSET_COUNT` and refuse to double-run. To rebuild
+`/srv/viper-deploy/assets/TARGET_HOSPITAL_ASSET_COUNT` and refuse to double-run. To rebuild
 the environment, `just reset` (clears ALL Viper data), then seed again.*
 
 ### Navigate to the justfile
-- cd /srv/viper/target-hospital-environment
+- cd /srv/viper-deploy/assets/target-hospital-environment
 
 ### Testing commands:
 

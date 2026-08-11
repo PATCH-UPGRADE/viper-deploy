@@ -6,7 +6,7 @@ START_INDEX="${1:?usage: create-assets.sh <start-index> <count>}"
 COUNT="${2:?usage: create-assets.sh <start-index> <count>}"
 
 VIPER_URL="${VIPER_URL:-http://localhost:3000}"
-VIPER_API_KEY_FILE="${VIPER_API_KEY_FILE:-/srv/viper/VIPER_API_KEY}"
+VIPER_API_KEY_FILE="${VIPER_API_KEY_FILE:-/srv/viper-deploy/assets/VIPER_API_KEY}"
 SCRIPT_DIR=$(cd "$(dirname "$0")/.." && pwd)
 CATALOG_FILE="${TARGET_HOSPITAL_CATALOG_FILE:-${SCRIPT_DIR}/device_catalog.json}"
 BATCH_SIZE="${BATCH_SIZE:-50}"

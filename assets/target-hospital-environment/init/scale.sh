@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-STATE_FILE="${TARGET_HOSPITAL_STATE_FILE:-/srv/viper/TARGET_HOSPITAL_ASSET_COUNT}"
+STATE_FILE="${TARGET_HOSPITAL_STATE_FILE:-/srv/viper-deploy/assets/TARGET_HOSPITAL_ASSET_COUNT}"
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
 echo -e "\n---------------------------------------------------------------"
