@@ -22,7 +22,7 @@ shell environment: `export ANTHROPIC_API_KEY=sk-ant-...` before `just start`.
 Never commit a real key to this repo.*
 
 ### Navigate to the justfile
-- cd /srv/viper/ivv_metrics/remediation_deployment_time
+- cd /srv/viper-deploy/assets/ivv_metrics/remediation_deployment_time
 
 ### Testing commands:
 

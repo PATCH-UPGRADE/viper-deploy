@@ -1,2 +1,2 @@
-VIPER_API_KEY=$(podman-compose -f /srv/viper/compose-aws.yml exec -T viper npm run db:create-test-api-key --silent 2>/dev/null | grep '^API_KEY=' | cut -d= -f2-)
-echo $VIPER_API_KEY > /srv/viper/VIPER_API_KEY
+VIPER_API_KEY=$(podman-compose -f /srv/viper-deploy/assets/compose-aws.yml exec -T viper npm run db:create-test-api-key --silent 2>/dev/null | grep '^API_KEY=' | cut -d= -f2-)
+echo $VIPER_API_KEY > /srv/viper-deploy/assets/VIPER_API_KEY
