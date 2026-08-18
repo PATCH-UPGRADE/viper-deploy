@@ -1,14 +1,14 @@
 start:
-    bash init/start.sh
+    bash ../lib/start.sh
 
 stop:
-    bash init/stop.sh
+    bash ../lib/stop.sh
 
 reset:
-    bash init/reset.sh
+    bash ../lib/reset.sh
 
 create-viper-api-key:
-    bash init/create-viper-api-key.sh
+    bash ../lib/create-viper-api-key.sh
 
 seed:
     bash init/seed.sh

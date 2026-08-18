@@ -1,17 +1,12 @@
-# Shared configuration for the IV&V metric init scripts. Source this; do not run it.
+# Shared configuration for the IV&V metric scripts. Source this; do not run it.
 #
-#   VIPER_TARGET=aws   (default) -> compose-aws.yml via podman-compose  (the deployed box)
-#   VIPER_TARGET=dev             -> compose.dev.yml via docker compose  (a local laptop)
+#   VIPER_TARGET=aws (default) -> compose-aws.yml via podman-compose
+#   VIPER_TARGET=dev           -> compose.dev.yml via docker compose
 #
-# Individual overrides win over the target defaults:
-#   VIPER_DEPLOY_ROOT   repo root (defaults to this checkout; /srv/viper-deploy on AWS)
-#   VIPER_COMPOSE_FILE  compose file to drive
-#   VIPER_COMPOSE_CMD   "podman-compose" or "docker compose"
-#   VIPER_CONTAINER_CMD "podman" or "docker"
-#   VIPER_ENV_FILE      shared VIPER env file (defaults to assets/.env)
+# VIPER_DEPLOY_ROOT, VIPER_COMPOSE_FILE, VIPER_COMPOSE_CMD, VIPER_CONTAINER_CMD and
+# VIPER_ENV_FILE each override the target default.
 
 if [ -z "${VIPER_DEPLOY_ROOT:-}" ]; then
-    # assets/ivv_metrics/lib/common.sh -> repo root
     VIPER_DEPLOY_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
 fi
 ASSETS_DIR="${VIPER_DEPLOY_ROOT}/assets"
@@ -42,10 +37,8 @@ if [ ! -r "${VIPER_ENV_FILE}" ]; then
     exit 1
 fi
 
-# Export the shared env so compose can interpolate ${VIPER_VERSION} and integrate.sh can
-# read ${BLUEFLOW_API_TOKEN} -- identically under podman-compose and docker compose, with
-# no dependency on --env-file flag semantics. Parsed rather than sourced so the file cannot
-# execute anything; a value already set in the environment wins, as it does in compose.
+# Export the shared env for compose interpolation. Parsed rather than sourced so the file
+# cannot execute anything; an already-set value wins, as it does in compose.
 while IFS= read -r line || [ -n "${line}" ]; do
     case "${line}" in ''|'#'*) continue ;; esac
     case "${line}" in 'export '*) line=${line#export } ;; esac
@@ -62,9 +55,12 @@ while IFS= read -r line || [ -n "${line}" ]; do
 done < "${VIPER_ENV_FILE}"
 unset line key value
 
+# Runtime state describing rows in Viper's database; reset.sh clears all of it.
 VIPER_API_KEY_FILE="${VIPER_API_KEY_FILE:-${ASSETS_DIR}/VIPER_API_KEY}"
+RDT_VULNERABILITY_ID_FILE="${RDT_VULNERABILITY_ID_FILE:-${ASSETS_DIR}/RDT_VULNERABILITY_ID}"
+TARGET_HOSPITAL_STATE_FILE="${TARGET_HOSPITAL_STATE_FILE:-${ASSETS_DIR}/TARGET_HOSPITAL_ASSET_COUNT}"
 
-# VIPER_COMPOSE_CMD is deliberately unquoted: it may be two words ("docker compose").
+# Unquoted: VIPER_COMPOSE_CMD may be two words ("docker compose").
 compose() {
     ${VIPER_COMPOSE_CMD} -f "${VIPER_COMPOSE_FILE}" "$@"
 }

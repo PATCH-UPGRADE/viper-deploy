@@ -1,13 +1,7 @@
-# Local development stack: VIPER, Inngest's dev server, and BlueFlow on Docker.
+# Local development stack: compose-aws.yml minus Caddy, so VIPER is reached directly at
+# http://localhost:3000. Run it with: export VIPER_TARGET=dev && just start
 #
-# Same services as compose-aws.yml minus Caddy -- there is no TLS termination and no
-# demo.viper-xi.app locally; VIPER is reached directly at http://localhost:3000. VIPER's
-# environment is the shared assets/.env, so it cannot drift from the deployed stack.
-#
-# Driven by the same just recipes as AWS:  export VIPER_TARGET=dev && just start
-#
-# The project name matches compose-aws.yml so volumes stay viper_pgdata etc. and
-# `just reset` removes the same names in both targets.
+# The project name matches compose-aws.yml so both targets use the same volume names.
 name: viper
 
 networks:
@@ -37,7 +31,6 @@ services:
   viper:
     image: ghcr.io/patch-upgrade/viper:${VIPER_VERSION:-latest}
     platform: ${VIPER_PLATFORM:-linux/amd64}
-    # Shared with compose-aws.yml so the two cannot drift -- see .env.local.example
     env_file:
       - .env
     volumes:
@@ -97,7 +90,7 @@ services:
 
   blueflow:
     image: docker.io/virtalabsinc/blueflow:latest
-    # Published for amd64 only, so Apple Silicon runs this under emulation.
+    # amd64 only; runs under emulation on Apple Silicon
     platform: ${BLUEFLOW_PLATFORM:-linux/amd64}
     volumes:
       - ./blueflow-init:/blueflow-init:ro
@@ -117,7 +110,6 @@ services:
       DJANGO_ALLOWED_HOSTS: blueflow,localhost,127.0.0.1,*
       VIPER_CALLBACK_ALLOWED_HOSTS: viper
       VIPER_CALLBACK_TIMEOUT: 30
-      # Same variable integrate.sh sends as its bearer token -- see .env.local.example
       API_TOKEN: ${BLUEFLOW_API_TOKEN:-demo-not-for-production}
     restart: on-failure
     deploy:

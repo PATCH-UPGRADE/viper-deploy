@@ -1,6 +1,6 @@
 #! /bin/bash
 
-. "$(dirname "$0")/../../lib/common.sh"
+. "$(dirname "$0")/common.sh"
 
 echo -e "\n---------------------------------------------------------------"
 echo "Starting Viper & Blueflow deployment. This may take a moment."

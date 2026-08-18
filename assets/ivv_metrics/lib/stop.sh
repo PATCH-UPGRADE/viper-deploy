@@ -1,9 +1,9 @@
 #! /bin/bash
 
-. "$(dirname "$0")/../../lib/common.sh"
+. "$(dirname "$0")/common.sh"
 
 echo -e "\n---------------------------------------------------------------"
-echo "Starting Viper & Blueflow deployment. This may take a moment."
+echo "Stopping Viper & Blueflow deployment. This may take a moment."
 echo -e "---------------------------------------------------------------\n"
 
-compose up -d
+compose down

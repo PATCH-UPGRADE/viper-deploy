@@ -17,7 +17,9 @@ would make that metric pass without any integration having run.*
 
 *`just seed` and `just scale` track what they created in
 `/srv/viper-deploy/assets/TARGET_HOSPITAL_ASSET_COUNT` and refuse to double-run. To rebuild
-the environment, `just reset` (clears ALL Viper data), then seed again.*
+the environment, `just reset` (clears ALL Viper data), then seed again. Reset deletes that
+count file along with the API key and the remediation fixture id, since all three describe
+rows in the database it just wiped -- so the full rebuild is `just reset` then `just test`.*
 
 ### Navigate to the justfile
 - `cd /srv/viper-deploy/assets/ivv_metrics/target-hospital-environment`

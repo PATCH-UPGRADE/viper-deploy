@@ -87,9 +87,7 @@ async def build_layout(ainjector):
 
                     await self.run_command('git', 'clone', 'https://github.com/PATCH-UPGRADE/viper-deploy.git', '/srv/viper-deploy')
 
-                    # Both compose files read assets/.env, which is gitignored. Seed it from
-                    # the AWS example so the stack starts without a manual step; -n keeps a
-                    # hand-edited file (a real ANTHROPIC_API_KEY, a pinned VIPER_VERSION).
+                    # Both compose files read assets/.env, which is gitignored; -n keeps a hand-edited one
                     await self.run_command('cp', '-n', '/srv/viper-deploy/assets/.env.aws.example', '/srv/viper-deploy/assets/.env')
 
                     # Not currently used; handling starting & integration via Justfile for first IV&V metric
