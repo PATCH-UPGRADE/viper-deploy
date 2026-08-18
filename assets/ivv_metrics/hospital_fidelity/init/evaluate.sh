@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
+. "$(dirname "$0")/../../lib/common.sh"
+
 VIPER_URL="${VIPER_URL:-http://localhost:3000}"
-VIPER_API_KEY_FILE="${VIPER_API_KEY_FILE:-/srv/viper-deploy/assets/VIPER_API_KEY}"
-BLUEFLOW_ASSETS_FILE="${BLUEFLOW_ASSETS_FILE:-/srv/viper-deploy/assets/blueflow_sample_assets.json}"
+BLUEFLOW_ASSETS_FILE="${BLUEFLOW_ASSETS_FILE:-${ASSETS_DIR}/blueflow_sample_assets.json}"
 
 if [[ ! -r "${VIPER_API_KEY_FILE}" ]]; then
   echo "ERROR: Viper API key file is not readable: ${VIPER_API_KEY_FILE}" >&2

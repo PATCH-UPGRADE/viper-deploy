@@ -23,7 +23,7 @@ would make that metric pass without any integration having run.*
 the environment, `just reset` (clears ALL Viper data), then seed again.*
 
 ### Navigate to the justfile
-- cd /srv/viper-deploy/assets/target-hospital-environment
+- cd /srv/viper-deploy/assets/ivv_metrics/target-hospital-environment
 
 ### Testing commands:
 
@@ -50,7 +50,10 @@ the environment, `just reset` (clears ALL Viper data), then seed again.*
 #### Reset the environment and clear all data in order to re-run tests
 - just reset
 
-### Running locally (developer machine)
+### Running against a local Viper checkout
+
+*Distinct from `VIPER_TARGET=dev` above, which runs the published Viper image on Docker.
+Use this when you are changing Viper's own source.*
 
 To run against a local Viper checkout instead of the deployed stack:
 

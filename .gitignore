@@ -1,2 +1,16 @@
 __pycache__/
 authorized_keys
+
+# Shared VIPER environment -- copy it from .env.aws.example or .env.local.example
+assets/.env
+
+# Runtime state written by the ivv_metrics init scripts
+assets/VIPER_API_KEY
+assets/RDT_VULNERABILITY_ID
+assets/TARGET_HOSPITAL_ASSET_COUNT
+assets/blueflow-init/*
+!assets/blueflow-init/.gitkeep
+
+# Caddy's bind-mounted state on the deployed box
+assets/caddy_data/
+assets/caddy_config/

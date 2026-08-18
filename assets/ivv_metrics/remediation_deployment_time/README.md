@@ -1,14 +1,14 @@
-# Remediation Deployment Time Metric
+# Remediation Deployment Time / Decision Generation Metric
 
 ## Metric: time for Viper's remediation analysis to complete after a TA4 remediation is submitted
 
-Submits one remediation to `POST /api/v1/remediations` and reports how long the
-`analyze-remediation` Inngest job took to terminate — meaning the VEX, triage,
-and mitigation agents have all run. The duration comes from Inngest's own run
-record (`ended_at − run_started_at`), not from a client-side stopwatch.
+* The time it takes for VIPER to generate decision support resources for a TA4 remediation (decision generation)
+* The time it takes to make a remediation available for operators to deploy (remediation deployment time)
 
-*Note that `just create-viper-api-key` creates an API key used by other commands
-that will expire after 24 hours by design. Re-run this command to create a new key.*
+Submits one remediation to `POST /api/v1/remediations` and reports how long the
+`analyze-remediation` Inngest job took to terminate. 
+The duration comes from Inngest's own run record (`ended_at − run_started_at`),
+not from a client-side stopwatch.
 
 *The reported number varies run to run — the job makes three LLM calls (two with
 extended thinking), and a single mitigation step has been observed near 95
@@ -17,9 +17,7 @@ nothing about the analysis content.*
 
 *This metric requires a working `ANTHROPIC_API_KEY` in the Viper container —
 without one the job fails after ~5 minutes of retries instead of producing a
-number. `compose-aws.yml` ships a placeholder and reads the real key from the
-shell environment: `export ANTHROPIC_API_KEY=sk-ant-...` before `just start`.
-Never commit a real key to this repo.*
+number.
 
 ### Navigate to the justfile
 - cd /srv/viper-deploy/assets/ivv_metrics/remediation_deployment_time
@@ -33,9 +31,6 @@ Never commit a real key to this repo.*
 - just create-viper-api-key
 
 #### Seed the metric fixture
-*A synthetic vulnerability (CVE-2099-0371) plus three infusion-pump assets. Safe
-to re-run — each run deletes and recreates the fixture, so a previous
-measurement's analysis results can never leak into the next one.*
 - just seed
 
 #### Submit one remediation and print the analysis duration
@@ -70,7 +65,10 @@ The script exits non-zero, with the reason, if the remediation never produced an
 Inngest event, if the run failed, or if the analysis no-opped because the
 fixture was missing its vulnerability.
 
-### Running locally (developer machine)
+### Running against a local Viper checkout
+
+*Distinct from `VIPER_TARGET=dev` above, which runs the published Viper image on Docker.
+Use this when you are changing Viper's own source.*
 
 To run against a local Viper checkout instead of the deployed stack, generate
 the two input files in the checkout, then point `evaluate.sh` at them. Every URL

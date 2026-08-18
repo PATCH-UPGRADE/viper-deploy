@@ -1,13 +1,16 @@
 #! /bin/bash
 
+. "$(dirname "$0")/../../lib/common.sh"
+
 echo -e "\n---------------------------------------------------------------"
 echo "Creating integration between Viper & Blueflow."
 echo -e "---------------------------------------------------------------\n"
 
-VIPER_API_KEY=$(cat /srv/viper-deploy/assets/VIPER_API_KEY)
+VIPER_API_KEY=$(cat "${VIPER_API_KEY_FILE}")
 VIPER_URL="${VIPER_URL:-http://localhost:3000}"
 BLUEFLOW_URL="${BLUEFLOW_URL:-http://localhost:8000}"
 BLUEFLOW_INTERNAL_URL="${BLUEFLOW_INTERNAL_URL:-http://blueflow:8000}"
+BLUEFLOW_API_TOKEN="${BLUEFLOW_API_TOKEN:-demo-not-for-production}"
 
 # ── Step A: register BlueFlow as a Viper integration ──────────────────────────
 echo "==> Step A: registering BlueFlow as a Viper integration..."
