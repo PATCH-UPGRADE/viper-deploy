@@ -1,0 +1,39 @@
+vm_images: {}
+devices:
+  788b66639e0e4ad8912b0477bf3e589f:
+    name: simulated
+    description: A simulated medical device
+    type: container
+    cloud_init: false
+    architecture: native
+    cpus: 2
+    memory: 4096
+    disk: 20480
+    disk_controller: virtio
+    display: true
+    vm_image_id: null
+    dhcp: true
+    mac_address: null
+    ipv4_manual: null
+    gateway: null
+    dns_servers: []
+    container_image: nginx:latest
+  4ed87d7daa47441c845a3b0ce6b3d8b7:
+    name: real
+    description: A real device
+    type: bareMetal
+    cloud_init: false
+    architecture: x86_64
+    cpus: 2
+    memory: 4096
+    disk: 20480
+    disk_controller: virtio
+    display: true
+    vm_image_id: null
+    container_image_id: null
+    dhcp: true
+    mac_address: 6c:4b:90:a2:42:8c
+    ipv4_manual: null
+    gateway: null
+    dns_servers: []
+pcaps: {}
