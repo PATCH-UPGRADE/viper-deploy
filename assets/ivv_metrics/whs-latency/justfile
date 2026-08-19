@@ -1,0 +1,31 @@
+# WHS Latency Metric
+# Measures end-to-end latency of WHS API operations
+
+# Image for whs start — matches DEFAULT_IMAGE in the whs source (patch_whs/cli.py).
+# Override per-run: just start WHS_IMAGE=...
+WHS_IMAGE := "ghcr.io/patch-upgrade/whs:latest"
+
+destroy:
+	bash init/destroy.sh
+
+# `just start`            -> whs start --image <WHS_IMAGE> --nic eth1
+# `just start --no-nic`   -> whs start --image <WHS_IMAGE>  (no passthru nic)
+start *FLAGS:
+	bash init/start.sh --image {{WHS_IMAGE}} {{FLAGS}}
+
+# Start (if needed) and block until the devices API is really live:
+# a 2xx response on /api/v1/devices whose body parses as JSON.
+# NB: 200-with-HTML from the SPA does not count.
+online: start
+	bash init/online.sh
+
+# Import the repo's whs-models.yaml via the import API, start a deploy,
+# and wait until that deploy finishes.
+seed: online
+	bash init/seed.sh
+
+# Run the latency probe (10 pings @ 0.5s to real + simulated, no reverse DNS).
+# Quiet by default; `just latency --verbose` shows per-packet output.
+# Depends on `start`, NOT `seed`, so it is cheap to run repeatedly.
+latency *FLAGS: start
+	bash init/latency.sh {{FLAGS}}

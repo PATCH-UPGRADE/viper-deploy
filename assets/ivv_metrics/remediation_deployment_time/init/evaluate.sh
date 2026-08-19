@@ -2,10 +2,11 @@
 
 set -euo pipefail
 
+. "$(dirname "$0")/../../lib/common.sh"
+
 VIPER_URL="${VIPER_URL:-http://localhost:3000}"
 INNGEST_URL="${INNGEST_URL:-http://localhost:8288}"
-VIPER_API_KEY_FILE="${VIPER_API_KEY_FILE:-/srv/viper-deploy/assets/VIPER_API_KEY}"
-RDT_VULNERABILITY_ID_FILE="${RDT_VULNERABILITY_ID_FILE:-/srv/viper-deploy/assets/RDT_VULNERABILITY_ID}"
+RDT_VULNERABILITY_ID_FILE="${RDT_VULNERABILITY_ID_FILE:-${ASSETS_DIR}/RDT_VULNERABILITY_ID}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-900}"
 POLL_SECONDS="${POLL_SECONDS:-5}"
 
@@ -22,24 +23,22 @@ fi
 VIPER_API_KEY=$(<"${VIPER_API_KEY_FILE}")
 VULNERABILITY_ID=$(<"${RDT_VULNERABILITY_ID_FILE}")
 
-SUBMITTED_AT=$(date +%s)
+POST_OUTPUT=$(compose exec -T \
+  -e VIPER_URL="${VIPER_URL}" \
+  -e VIPER_API_KEY="${VIPER_API_KEY}" \
+  -e RDT_VULNERABILITY_ID="${VULNERABILITY_ID}" \
+  viper npx tsx scripts/post-remediation-metric.ts) \
+  || { echo "ERROR: remediation POST failed" >&2; exit 1; }
 
-CREATE_RESPONSE=$(curl --silent --show-error --fail-with-body \
-  -X POST "${VIPER_URL}/api/v1/remediations" \
-  -H "Authorization: Bearer ${VIPER_API_KEY}" \
-  -H "Content-Type: application/json" \
-  --data-raw "$(jq -cn --arg vulnId "${VULNERABILITY_ID}" '{
-    vulnerabilityId: $vulnId,
-    description: "RDT metric: firmware update for the Infuse Station IQ",
-    narrative: "Synthetic remediation submitted by the remediation_deployment_time IV&V metric.",
-    artifacts: [{
-      name: "RDT metric placeholder artifact",
-      artifactType: "Documentation",
-      downloadUrl: "https://example.com/rdt-metric-notes.pdf"
-    }]
-  }')") || { echo "ERROR: remediation POST failed: ${CREATE_RESPONSE}" >&2; exit 1; }
+REMEDIATION_ID=$(echo "${POST_OUTPUT}" | grep '^REMEDIATION_ID=' | cut -d= -f2- | tr -d '\r')
+SUBMITTED_AT=$(echo "${POST_OUTPUT}" | grep '^SUBMITTED_AT=' | cut -d= -f2- | tr -d '\r')
 
-REMEDIATION_ID=$(jq -er '.remediation.id' <<<"${CREATE_RESPONSE}")
+if [[ -z "${REMEDIATION_ID}" ]] || [[ -z "${SUBMITTED_AT}" ]]; then
+  echo "ERROR: post script did not print REMEDIATION_ID= and SUBMITTED_AT=" >&2
+  echo "${POST_OUTPUT}" >&2
+  exit 1
+fi
+
 echo "Submitted remediation ${REMEDIATION_ID}"
 
 # A 200 from the POST does not prove the job was enqueued (the API swallows

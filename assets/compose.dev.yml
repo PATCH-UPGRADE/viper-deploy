@@ -1,3 +1,7 @@
+# Local development stack: compose-aws.yml minus Caddy, so VIPER is reached directly at
+# http://localhost:3000. Run it with: export VIPER_TARGET=dev && just start
+#
+# The project name matches compose-aws.yml so both targets use the same volume names.
 name: viper
 
 networks:
@@ -17,7 +21,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes: 
+    volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
@@ -26,6 +30,7 @@ services:
 
   viper:
     image: ghcr.io/patch-upgrade/viper:${VIPER_VERSION:-latest}
+    platform: ${VIPER_PLATFORM:-linux/amd64}
     env_file:
       - .env
     volumes:
@@ -48,20 +53,6 @@ services:
       - "8288:8288"
     entrypoint: ["/bin/sh", "-c"]
     command: ["inngest dev -u $$INNGEST_BOOTSTRAP_URL"]
-    depends_on:
-      - viper
-    networks:
-      - viper_stack
-
-  caddy:
-    image: docker.io/caddy/caddy:latest
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /srv/viper-deploy/assets/Caddyfile:/etc/caddy/Caddyfile
-      - /srv/viper-deploy/assets/caddy_data:/data
-      - /srv/viper-deploy/assets/caddy_config:/config
     depends_on:
       - viper
     networks:
@@ -99,6 +90,8 @@ services:
 
   blueflow:
     image: docker.io/virtalabsinc/blueflow:latest
+    # amd64 only; runs under emulation on Apple Silicon
+    platform: ${BLUEFLOW_PLATFORM:-linux/amd64}
     volumes:
       - ./blueflow-init:/blueflow-init:ro
     depends_on:
@@ -129,13 +122,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
-    ports: 
+    ports:
       - "8000:8000"
     networks:
       - viper_stack
 
   blueflow-worker:
     image: docker.io/virtalabsinc/blueflow:latest
+    platform: ${BLUEFLOW_PLATFORM:-linux/amd64}
     depends_on:
       blueflow:
         condition: service_healthy

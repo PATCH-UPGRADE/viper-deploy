@@ -13,7 +13,7 @@
 - just test
 
 #### Create Viper API key
-- just crete-viper-api-key
+- just create-viper-api-key
 
 #### Seed sample assets into Blueflow CMMS
 - just seed

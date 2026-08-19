@@ -87,6 +87,9 @@ async def build_layout(ainjector):
 
                     await self.run_command('git', 'clone', 'https://github.com/PATCH-UPGRADE/viper-deploy.git', '/srv/viper-deploy')
 
+                    # Both compose files read assets/.env, which is gitignored; -n keeps a hand-edited one
+                    await self.run_command('cp', '-n', '/srv/viper-deploy/assets/.env.aws.example', '/srv/viper-deploy/assets/.env')
+
                     # Not currently used; handling starting & integration via Justfile for first IV&V metric
                     await self.run_command('cp', '/srv/viper-deploy/assets/viper.service', '/etc/systemd/system/viper.service')
 
