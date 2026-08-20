@@ -35,13 +35,6 @@ async def build_layout(ainjector):
                        port=8000),
             )
 
-        class whs_group(AwsSecurityGroup):
-            name = 'whs-http'
-            ingress_rules = (
-                SgRule(cidr='0.0.0.0/0',
-                       port=8080),
-            )
-
         class proxy_group(AwsSecurityGroup):
             name = 'proxy'
             ingress_rules = (
@@ -53,7 +46,7 @@ async def build_layout(ainjector):
 
         class viper_net(NetworkModel):
             v4_config = V4Config(network="10.10.1.0/24")
-            aws_security_groups = ['ssh', 'viper-http', 'blueflow-http', 'whs-http', 'proxy']
+            aws_security_groups = ['ssh', 'viper-http', 'blueflow-http', 'proxy']
 
         class viper_address(VpcAddress):
             name = 'viper'
